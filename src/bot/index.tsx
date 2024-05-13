@@ -104,8 +104,13 @@ bot.onText(/\/gas (.+)/, async (msg, match) => {
             const Transaction = new sendTransaction('https://rpc2.bahamut.io', '0xe670ee1c4e039c8ca28e61d0afa621fc29ab576f14ac44e81cc15b121c8ac862');
           const { response  , status } =  await Transaction.Transfer(address, '0.005');
           if(status === 200){
-           return await bot.sendMessage(chatId, 'Gas transfer initiated! ✅',{ reply_to_message_id: msg.message_id });
+            if(response?.error){
+                return await bot.sendMessage(chatId, `❌ Error: ${response.error.message}`,{ reply_to_message_id: msg.message_id });
+            } 
+           return await bot.sendMessage(chatId, 'Transaction initiated! ✅',{ reply_to_message_id: msg.message_id });
           }
+          
+
           await bot.sendMessage(chatId, `❌ Error: ${response}`,{ reply_to_message_id: msg.message_id });
         }
     } catch (error: any) {
