@@ -73,7 +73,7 @@ bot.onText(/\/send (.+)/, async (msg, match) => {
                         // Now you have all the required parameters, you can proceed with the transaction
                         try {
                            const tx = await Transaction.ERC20Transfer(to as string, amount as string, contractAddress[symbol as string]);
-                           console.log(tx)
+                            
                            await bot.sendMessage(chatId, `Transaction initiated! ✅ ${ tx.hash }`, { reply_to_message_id: msg.message_id });
                         } catch (error: any) {
                             await bot.sendMessage(chatId, error.message, { reply_to_message_id: msg.message_id });
