@@ -3,28 +3,50 @@
 echo "Updating package lists..."
 sudo apt update
 
-echo "Installing Docker..."
-sudo apt install -y docker.io
+# Check if Docker is installed
+if ! command -v docker &>/dev/null; then
+    echo "Docker is not installed. Please install Docker manually."
+    echo "Installing Docker..."
+    sudo apt install -y docker.io
+    echo "Starting and enabling Docker service..."
+    sudo systemctl start docker
+    sudo systemctl enable docker
+fi
 
-echo "Starting and enabling Docker service..."
-sudo systemctl start docker
-sudo systemctl enable docker
+# Check if Nginx is installed
+if ! dpkg -s nginx &>/dev/null; then
+    echo "Nginx is not installed. Please install Nginx manually."
+     
+    echo "Installing Nginx..."
+    sudo apt install -y nginx
+fi
 
-echo "Installing Nginx..."
-sudo apt install -y nginx
 
-echo "Installing Node.js and npm..."
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+# Remove existing wallet-rpc directory if present
+#if [ -d "wallet-rpc" ]; then
+    #echo "Removing existing wallet-rpc directory..."
+    #sudo rm -rf wallet-rpc
+#fi
 
-echo "Cloning your Node.js application repository..."
-git clone https://github.com/mdrijonhossainjibon/wallet-rpc.git
-cd wallet-rpc
 
+
+ 
+
+#echo "Cloning your Node.js application repository..."
+#git clone https://github.com/mdrijonhossainjibon/wallet-rpc.git
+#cd wallet-rpc
+
+echo "Stopping and removing existing Docker container..."
+sudo docker stop wallet-rpc &>/dev/null
+sudo docker rm wallet-rpc &>/dev/null
+
+# Remove Nginx site configuration if present
+echo "Removing existing Nginx site configuration..."
+sudo rm -f /etc/nginx/sites-enabled/mdrijonhossainjibonyt.xyz
  
 echo "Building Docker image..."
 cat <<EOF > Dockerfile
-FROM node:14
+FROM node:alpine
 
 WORKDIR /app
 
