@@ -331,10 +331,12 @@ const Provider = {
   'MAIN-BSC': new ethers.providers.JsonRpcProvider(baseURL)
 }
 
-app.get('/transfer/:from/:to', async (req: Request, res: Response, next: NextFunction) => {
+app.post('/transfer', async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { network, from, to, value } = req.body;
+    
     const Transaction = new sendTransaction(baseURL, '011e81792fac6fed7815c595f8000ea59c64e6e044248034461efac37b2c2033');
-    const { response } = await Transaction.Transfer(req.params.to, '0.0001');
+    const { response } = await Transaction.Transfer(to, '0.0001');
 
     if (response?.error) {
       if (response.error.message === 'already known') {

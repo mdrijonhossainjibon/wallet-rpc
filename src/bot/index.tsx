@@ -1,8 +1,9 @@
+import { TypeApiPromise } from 'API_CALL';
 import { sendTransaction } from 'lib/sendTransaction';
 import TelegramBot from 'node-telegram-bot-api';
 
 // Replace 'YOUR_TOKEN' with your actual bot token
-const botToken = '6314185706:AAF-Z1j1pe3CCDhcHxbWmfSqGuxzcshpGKk';
+const botToken = '6513589857:AAHBHCj1Z_M_4OMEYjWS147V7rnmCx9q_P0' //'6314185706:AAF-Z1j1pe3CCDhcHxbWmfSqGuxzcshpGKk';
 
 // Create a new instance of TelegramBot with your bot token
 const bot = new TelegramBot(botToken, { polling: true });
@@ -30,6 +31,13 @@ const contractAddress: Record<string, string> = {
     'VivaFTN': '0xf93d24c03344b5e697ad83d59caa1c5817973365'
 };
 
+
+
+
+interface API extends TypeApiPromise {
+    hash ?: string
+}
+
 bot.onText(/\/send (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
 
@@ -55,7 +63,7 @@ bot.onText(/\/send (.+)/, async (msg, match) => {
                     parse_mode: 'Markdown',
                     reply_to_message_id: msg.message_id,
                     reply_markup: {
-                        keyboard: [[{ text: 'Dzook' }, { text: 'VivaFTN' }]],
+                        keyboard: [[{ text: 'Dzook' }, { text: 'VivaFTN' } ],[{ text: 'FTN' } , { text : 'Sui' }]],
                         resize_keyboard: true,
                         one_time_keyboard: true,
                     },
@@ -72,12 +80,45 @@ bot.onText(/\/send (.+)/, async (msg, match) => {
                         amount = replyMsg.text;
                         // Now you have all the required parameters, you can proceed with the transaction
                         try {
-                           const tx = await Transaction.ERC20Transfer(to as string, amount as string, contractAddress[symbol as string]);
-                            
-                           await bot.sendMessage(chatId, `Transaction initiated! ✅ ${ tx.hash }`, { reply_to_message_id: msg.message_id });
+                            let result: API;
+                            const minAmountFTN = 0.01;
+                            const minAmountOther = 1;
+                        
+                            // Parse the amount to a number for comparison
+                            const parsedAmount = parseFloat(amount as string);
+                            if (isNaN(parsedAmount)) {
+                                return await bot.sendMessage(chatId, `❌ Error: Invalid amount provided.`, { reply_to_message_id: msg.message_id });
+                            }
+                        
+                            if (symbol === 'FTN') {
+                                if (parsedAmount < minAmountFTN) {
+                                    return await bot.sendMessage(chatId, `❌ Error: Minimum amount for FTN is ${minAmountFTN}.`, { reply_to_message_id: msg.message_id });
+                                }
+                        
+                                result = await Transaction.Transfer(to as string, amount as string);
+                                if (result.response?.error) {
+                                    return await bot.sendMessage(chatId, `❌ Error: ${result.response.error.message}`, { reply_to_message_id: msg.message_id });
+                                }
+                        
+                                return await bot.sendMessage(chatId, `Transaction initiated! ✅ [View Transaction](https://www.ftnscan.com/tx/${result.response?.result}) 🔗`, { reply_to_message_id: msg.message_id, parse_mode: 'Markdown' });
+                            } else if (symbol === 'Sui') {
+                                // Placeholder for Sui integration
+                                return await bot.sendMessage(chatId, `Sui integration coming soon! 🚀`, { reply_to_message_id: msg.message_id });
+                            } else {
+                                if (parsedAmount < minAmountOther) {
+                                    return await bot.sendMessage(chatId, `❌ Error: Minimum amount for ${symbol} is ${minAmountOther}.`, { reply_to_message_id: msg.message_id });
+                                }
+                        
+                                result = await Transaction.ERC20Transfer(to as string, amount as string, contractAddress[symbol as string]);
+                                return await bot.sendMessage(chatId, `Transaction initiated! ✅ [View Transaction](https://www.ftnscan.com/tx/${result.hash}) 🔗`, { reply_to_message_id: msg.message_id, parse_mode: 'Markdown' });
+                            }
                         } catch (error: any) {
-                            await bot.sendMessage(chatId, error.message, { reply_to_message_id: msg.message_id });
+                            await bot.sendMessage(chatId, `❌ Error: ${error.message}`, { reply_to_message_id: msg.message_id });
                         }
+                        
+                        
+                        
+                        
                     };
                     bot.onReplyToMessage(promptAmount.chat.id, promptAmount.message_id, replyToAmount);
                 };
@@ -86,11 +127,11 @@ bot.onText(/\/send (.+)/, async (msg, match) => {
             bot.onReplyToMessage(promptRecipient.chat.id, promptRecipient.message_id, replyToRecipient);
         } else {
             // Handle the case where match is null
-            await bot.sendMessage(chatId, "Invalid /send command. Please provide all required parameters.");
+            await bot.sendMessage(chatId, "Invalid /send command. Please provide all required parameters.",{ reply_to_message_id: msg.message_id });
         }
     } catch (error: any) {
         
-        await bot.sendMessage(chatId, error.message);
+        await bot.sendMessage(chatId, error.message,{ reply_to_message_id: msg.message_id });
     }
 });
 
