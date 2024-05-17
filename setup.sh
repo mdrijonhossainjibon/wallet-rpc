@@ -41,30 +41,25 @@ fi
 current_step=$((current_step + 1))
 update_progress $current_step $total_steps
 
-# Step 4: Check if MongoDB is installed
-if ! dpkg -s mongodb &>/dev/null; then
-    echo "MongoDB is not installed. Please install MongoDB manually."
-    echo "Installing MongoDB..."
-    sudo apt install -y mongodb
-    echo "Starting and enabling MongoDB service..."
-    sudo systemctl start mongodb
-    sudo systemctl enable mongodb
+# Step 4: Uninstall existing MongoDB if installed
+if dpkg -s mongodb &>/dev/null || dpkg -s mongodb-org &>/dev/null; then
+    echo "MongoDB is installed. Uninstalling MongoDB..."
+    sudo systemctl stop mongod
+    sudo apt-get purge -y mongodb mongodb-org
+    sudo apt-get autoremove -y
+    sudo rm -r /var/log/mongodb
+    sudo rm -r /var/lib/mongodb
 fi
 current_step=$((current_step + 1))
 update_progress $current_step $total_steps
+# Step 5: Pull and run MongoDB Docker image
+echo "Pulling MongoDB Docker image..."
+sudo docker pull mongo
 
-# Step 5: Configure MongoDB with authentication
-echo "Configuring MongoDB with authentication..."
-sudo mongo <<EOF
-use admin
-db.createUser({
-  user: "root",
-  pwd: "123456",
-  roles: [{ role: "root", db: "admin" }]
-})
-EOF
-sudo sed -i '/#security:/a\  authorization: "enabled"' /etc/mongodb.conf
-sudo systemctl restart mongodb
+echo "Running MongoDB Docker container..."
+sudo docker run -d --name mongo -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123456 mongo
+ 
+
 current_step=$((current_step + 1))
 update_progress $current_step $total_steps
 

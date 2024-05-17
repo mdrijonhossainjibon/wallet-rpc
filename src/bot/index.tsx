@@ -3,8 +3,8 @@ import { sendTransaction, sendTransactionSui } from 'lib/sendTransaction';
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
 // Replace 'YOUR_TOKEN' with your actual bot token
-const botToken = '6513589857:AAHBHCj1Z_M_4OMEYjWS147V7rnmCx9q_P0' //'6314185706:AAF-Z1j1pe3CCDhcHxbWmfSqGuxzcshpGKk';
-
+const botToken =  '6314185706:AAF-Z1j1pe3CCDhcHxbWmfSqGuxzcshpGKk';
+//'6513589857:AAHBHCj1Z_M_4OMEYjWS147V7rnmCx9q_P0' 
 // Create a new instance of TelegramBot with your bot token
 const bot = new TelegramBot(botToken, { polling: true });
 
