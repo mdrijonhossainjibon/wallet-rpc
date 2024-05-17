@@ -30,7 +30,7 @@ fi
 
 
 
- 
+#chmod +x setup.sh 
 
 #echo "Cloning your Node.js application repository..."
 #git clone https://github.com/mdrijonhossainjibon/wallet-rpc.git

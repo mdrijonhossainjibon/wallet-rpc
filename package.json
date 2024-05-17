@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@mysten/sui.js": "^0.54.1",
     "@types/axios": "^0.14.0",
     "@types/express": "^4.17.21",
     "@types/secp256k1": "^4.0.6",
@@ -31,8 +32,10 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
+    "@scallop-io/sui-kit": "^0.45.0",
     "@types/express-rate-limit": "^6.0.0",
     "@types/node-telegram-bot-api": "^0.64.6",
+    "bech32": "^2.0.0",
     "bip39": "^3.1.0",
     "body-parser": "^1.20.2",
     "bs58": "^5.0.0",

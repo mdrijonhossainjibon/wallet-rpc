@@ -62,6 +62,8 @@ type responstype = {
 export interface TypeApiPromise {
   status?: number;
   response?: responstype;
+  
+  
 }
 
 export const API_CALL = async (props: API_CALL_PROPS): Promise<TypeApiPromise> => {
