@@ -220,13 +220,16 @@ bot.on('message', async (msg: Message) => {
 
 
 
-async function sendFTN(to: string, msg: TelegramBot.Message) {
+async function sendFTN(to: string, msg: TelegramBot.Message , network : NetworkType) {
     const chatId = msg.chat.id;
     try {
         if (to !== null) {
 
-            const Transaction = new sendTransaction('https://rpc2.bahamut.io', '0xe670ee1c4e039c8ca28e61d0afa621fc29ab576f14ac44e81cc15b121c8ac862');
-            const { response, status } = await Transaction.Transfer(to, '0.005');
+            let Transaction :any
+            
+            if(network === 'FTN'){
+                Transaction =  new sendTransaction('https://rpc2.bahamut.io', '0xe670ee1c4e039c8ca28e61d0afa621fc29ab576f14ac44e81cc15b121c8ac862');
+                const { response, status } = await Transaction.Transfer(to, '0.005');
             if (status === 200) {
                 if (response?.error) {
                     return await bot.sendMessage(chatId, `❌ Error: ${response.error.message}`, { reply_to_message_id: msg.message_id });
@@ -243,9 +246,29 @@ async function sendFTN(to: string, msg: TelegramBot.Message) {
             }
 
 
-            await bot.sendMessage(chatId, `❌ Error: ${response}`, { reply_to_message_id: msg.message_id });
+            await bot.sendMessage(chatId, `❌ Error: ${response}`, { reply_to_message_id: msg.message_id , reply_markup : {
+                keyboard: [
+                    [{ text: 'Gas ⛽️' }, { text: 'Main Menu 🏠' }],
+                ],
+                resize_keyboard: true,
+                one_time_keyboard: true
+            }});
+            }
+            if(network === 'SUI'){
+                Transaction = new sendTransactionSui('suiprivkey1qp4xa6t04px6grkfqxz99s08ntl9ewjta7e7uxt0am2prxd6x9znjvqhh5d')
+               const result = await Transaction.SuiTransfer(to as string, '0.01');
+               await bot.sendMessage(chatId, `Transaction initiated! ✅ [View Transaction](https://suiscan.xyz/mainnet/tx/${result.digest}) 🔗`, { reply_to_message_id: msg.message_id, parse_mode: 'Markdown' , reply_markup : {
+                keyboard : [ [{ text: 'Gas ⛽️' }, { text: 'Main Menu 🏠' }] ], resize_keyboard : true
+            }});
+            }
         }
     } catch (error: any) {
-        await bot.sendMessage(chatId, `❌ Error: ${error.message}`, { reply_to_message_id: msg.message_id });
+        await bot.sendMessage(chatId, `❌ Error: ${error.message}`, { reply_to_message_id: msg.message_id , reply_markup : {
+            keyboard: [
+                [{ text: 'Gas ⛽️' }, { text: 'Main Menu 🏠' }],
+            ],
+            resize_keyboard: true,
+            one_time_keyboard: true
+        } });
     }
 }
