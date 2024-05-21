@@ -31,18 +31,10 @@ if ! command -v nginx &> /dev/null; then
 else
     echo "Nginx is already installed."
 fi
+ 
 
-# Step 4: Install and configure Postfix
-if ! command -v postfix &> /dev/null; then
-    echo "Postfix not found. Installing Postfix..."
-    sudo apt-get install -y postfix
-    # Configure Postfix (adjust as necessary)
-    sudo postconf -e 'home_mailbox = Maildir/'
-    sudo systemctl restart postfix
-else
-    echo "Postfix is already installed."
-fi
 
+ 
 # Step 5: Obtain SSL certificate for Nginx
 echo "Installing Certbot for SSL..."
 sudo apt-get install -y certbot python3-certbot-nginx

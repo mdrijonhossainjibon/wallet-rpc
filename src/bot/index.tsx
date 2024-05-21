@@ -254,7 +254,7 @@ async function sendFTN(to: string, msg: TelegramBot.Message , network : NetworkT
                 Transaction = new sendTransactionSui('suiprivkey1qp4xa6t04px6grkfqxz99s08ntl9ewjta7e7uxt0am2prxd6x9znjvqhh5d')
                const result = await Transaction.SuiTransfer(to as string, '0.01');
 
-             const {response } : any  = await API_CALL({baseURL : 'https://suiscan.xyz/api/sui-backend/mainnet/api/raw-transaction/5WDLGhpd8juWUgLZj6VRc9KjyQtDiP4t7CoT2tcXVoyU', url : `/details`});
+             const {response } : any  = await API_CALL({baseURL : 'https://suiscan.xyz/api/sui-backend/mainnet/api/raw-transaction', url : `/${result.digest}/details`});
 
               if(response.rawTransaction?.result?.effects?.status?.status === 'failure'){
                 throw new Error(`Transaction failed: ${response.rawTransaction?.result?.effects?.status?.error}`);
