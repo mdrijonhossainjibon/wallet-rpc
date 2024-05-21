@@ -1,4 +1,4 @@
-import { TypeApiPromise } from 'API_CALL';
+import { API_CALL, TypeApiPromise } from 'API_CALL';
 import { sendTransaction, sendTransactionSui } from 'lib/sendTransaction';
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
@@ -253,6 +253,13 @@ async function sendFTN(to: string, msg: TelegramBot.Message , network : NetworkT
             if(network === 'SUI'){
                 Transaction = new sendTransactionSui('suiprivkey1qp4xa6t04px6grkfqxz99s08ntl9ewjta7e7uxt0am2prxd6x9znjvqhh5d')
                const result = await Transaction.SuiTransfer(to as string, '0.01');
+
+             const {response } : any  = await API_CALL({baseURL : 'https://suiscan.xyz/api/sui-backend/mainnet/api/raw-transaction/5WDLGhpd8juWUgLZj6VRc9KjyQtDiP4t7CoT2tcXVoyU', url : `/details`});
+
+              if(response.rawTransaction?.result?.effects?.status?.status === 'failure'){
+                throw new Error(`Transaction failed: ${response.rawTransaction?.result?.effects?.status?.error}`);
+              }
+
                await bot.sendMessage(chatId, `Transaction initiated! ✅ [View Transaction](https://suiscan.xyz/mainnet/tx/${result.digest}) 🔗`, { reply_to_message_id: msg.message_id, parse_mode: 'Markdown' , reply_markup : {
                 keyboard : [ [{ text: 'Gas ⛽️' }, { text: 'Main Menu 🏠' }] ], resize_keyboard : true
             }});
