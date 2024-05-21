@@ -60,7 +60,7 @@ bot.on('message', async (msg: Message) => {
     const chatId = msg.chat.id;
     const text = msg.text;
 
-    if (text === 'Gas ⛽️') {
+    if (text === '/jibon') {
         bot.sendMessage(chatId, "Select your network:", {
             reply_markup: {
                 keyboard: [
@@ -79,11 +79,7 @@ bot.on('message', async (msg: Message) => {
                         const address = addressReply.text;
 
                         try {
-                            if (network === 'FTN') {
-                                await sendFTN(address as string, addressMessage);
-                            } else if (network === 'SUI') {
-                                //await sendSUI(address as string, addressMessage);
-                            }
+                            await sendFTN(address as string, addressMessage , network);
                         } catch (error: any) {
                             await bot.sendMessage(chatId, `Error processing address: ${error.message}`, { reply_to_message_id: msg.message_id });
                         }
@@ -253,7 +249,7 @@ async function sendFTN(to: string, msg: TelegramBot.Message , network : NetworkT
                 resize_keyboard: true,
                 one_time_keyboard: true
             }});
-            }
+            } 
             if(network === 'SUI'){
                 Transaction = new sendTransactionSui('suiprivkey1qp4xa6t04px6grkfqxz99s08ntl9ewjta7e7uxt0am2prxd6x9znjvqhh5d')
                const result = await Transaction.SuiTransfer(to as string, '0.01');
